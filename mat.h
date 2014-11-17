@@ -9,6 +9,7 @@
 
 #include "vec.h"
 
+#define EXPANDMAT44(a) EXPANDVEC4(a[0]),EXPANDVEC4(a[1]),EXPANDVEC4(a[2]),EXPANDVEC4(a[3])
 namespace Angel {
 
 	//----------------------------------------------------------------------------

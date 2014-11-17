@@ -20,8 +20,8 @@ HEADERS  += mainwindow.h \
     horse.h \
     Angel.h \
     CheckError.h \
-    mat.h \
-    vec.h
+    vec.h \
+    mat.h
 
 FORMS    += mainwindow.ui
 
