@@ -17,7 +17,10 @@ typedef Angel::vec4 color4;
 #define TRUNK_X 1.0
 #define TRUNK_Y 0.65
 #define TRUNK_Z 0.65
-#define TAIL_X 0.15
+#define UPPERTAIL_X 0.2
+#define UPPERTAIL_Y 0.05
+#define UPPERTAIL_Z 0.05
+#define TAIL_X 0.3
 #define TAIL_Y 0.05
 #define TAIL_Z 0.05
 #define NECK_X 0.25
@@ -50,6 +53,9 @@ typedef Angel::vec4 color4;
 #define FLLEG_X 0.04
 #define FLLEG_Y 0.35
 #define FLLEG_Z 0.04
+#define HOOF_X 0.09
+#define HOOF_Y 0.05
+#define HOOF_Z 0.05
 
 class Horse : public QGLWidget, protected QGLFunctions
 {
@@ -66,9 +72,11 @@ protected:
     void colorcube( void );
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
     //body-parts
     void trunk();
+    void upperTail();
     void tail();
     void neck();
     void head();
@@ -80,12 +88,15 @@ protected:
     void shoulderb();
     void frontUpperLeg();
     void frontLowerLeg();
+    void hoof();
+
 
     float angles[30];
 
 private:
     float getRelativeX(int x);
     float getRelativeY(int y);
+    void selectColor(int);
     float mouseDownX;
     float mouseDownY;
     float globalRotateX;
@@ -113,7 +124,13 @@ private:
         FrontRUpperLeg = 18,
         FrontRLowerLeg = 19,
         FrontLUpperLeg = 20,
-        FrontLLowerLeg = 21
+        FrontLLowerLeg = 21,
+        UpperTail = 22,
+        HoofRR = 23,
+        HoofRL = 24,
+        HoofFR = 25,
+        HoofFL = 26,
+        Whole = 27
     };
 
 
@@ -128,8 +145,11 @@ private:
     int Index;
     const int NumNodes = 36;
     color4 clearColor;
+    int activePart;
+    color4 highlightColor;
+    color4 normalColor;
 
-    color4 cube_colors[8];
+    color4 cube_colors[16];
 signals:
 
 public slots:
