@@ -8,9 +8,14 @@
 #include <QStack>
 #include <QMouseEvent>
 #include "Angel.h"
+#include <string>
+#include <fstream>
+#include <QThread>
 
 #define NUM_VERTICES 500
 #define MODEL_SIZE 2
+#define SLEEPTIME 50
+#define FRAMELENGTH 1000
 typedef Angel::vec4 point4;
 typedef Angel::vec4 color4;
 
@@ -91,16 +96,19 @@ protected:
     void hoof();
 
 
-    float angles[30];
+    float angles[30][30];
 
 private:
     float getRelativeX(int x);
     float getRelativeY(int y);
     void selectColor(int);
+    void loadFrame(int act);
     float mouseDownX;
     float mouseDownY;
     float globalRotateX;
     float globalRotateY;
+    int activeFrame;
+    int totalFrames;
 
     enum {
         TailZ = 0,
@@ -153,6 +161,8 @@ private:
 signals:
 
 public slots:
+    void loadAnglesFromFile(std::string fileName);
+    void animate();
 
 };
 

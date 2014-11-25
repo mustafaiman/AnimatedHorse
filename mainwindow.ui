@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1366</width>
+    <width>1000</width>
     <height>768</height>
    </rect>
   </property>
@@ -19,10 +19,36 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1166</width>
+      <width>740</width>
       <height>740</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>10</y>
+      <width>241</width>
+      <height>701</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="playButton">
+       <property name="text">
+        <string>Play</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="loadButton">
+       <property name="text">
+        <string>Load</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -30,7 +56,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1366</width>
+     <width>1000</width>
      <height>21</height>
     </rect>
    </property>
@@ -52,8 +78,44 @@
    <extends>QWidget</extends>
    <header>horse.h</header>
    <container>1</container>
+   <slots>
+    <slot>animate()</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>loadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>slot1()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>778</x>
+     <y>516</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>645</x>
+     <y>303</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playButton</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>animate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>791</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>625</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
