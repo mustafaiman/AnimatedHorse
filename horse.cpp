@@ -525,11 +525,10 @@ void Horse::quad( int a, int b, int c, int d )
 void Horse::animate() {
     qDebug() << "start";
     for(int i=2;i<=totalFrames;i++) {
-        for(int j=0;j<=FRAMELENGTH/SLEEPTIME;j++) {
+        for(int j=0;j<=frameInterval[i-1]/SLEEPTIME;j++) {
             for(int k=0;k<Whole;k++) {
-                angles[0][k] = (float)j*(angles[i][k]-angles[i-1][k])/(FRAMELENGTH/SLEEPTIME) + angles[i-1][k];
+                angles[0][k] = (float)j*(angles[i][k]-angles[i-1][k])/(frameInterval[i-1]/SLEEPTIME) + angles[i-1][k];
             }
-            qDebug() << angles[0][FrontLLowerLeg];
             QThread::msleep(SLEEPTIME);
             updateGL();
         }
@@ -538,16 +537,43 @@ void Horse::animate() {
 
 void Horse::loadAnglesFromFile(std::string fileName) {
     totalFrames++;
-    activeFrame = totalFrames;
     activePart = TAIL_Y;
     std::ifstream file(fileName);
-    for(int i=0;i<Whole; i++) {
-        file >> angles[activeFrame][i];
+    file >> totalFrames;
+    for(int i=1;i<= totalFrames;i++) {
+        activeFrame = i;
+        for(int i=0;i<Whole; i++) {
+            file >> angles[activeFrame][i];
+        }
+        file >> frameInterval[i];
     }
     file.close();
     loadFrame(activeFrame);
     qDebug() << "totalFrames " << totalFrames << "activeFrame" << activeFrame;
     update();
+}
+
+std::string Horse::dump() {
+    std::ostringstream str;
+    str << totalFrames << "\n";
+    for(int i=1;i<= totalFrames;i++) {
+        for(int j=0;j<Whole; j++) {
+            str << angles[i][j] << "\n";
+        }
+        str << frameInterval[i] << "\n";
+    }
+    return str.str();
+}
+
+
+void Horse::recordActiveScene(int interval) {
+    frameInterval[activeFrame] = interval;
+    totalFrames++;
+    activeFrame = totalFrames;
+    for(int i=0;i<Whole;i++) {
+        angles[activeFrame][i] = angles[0][i];
+    }
+    frameInterval[activeFrame] = 0;
 }
 
 void Horse::constraintAngle(int ang, double low, double high) {

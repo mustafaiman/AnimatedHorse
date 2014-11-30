@@ -11,11 +11,12 @@
 #include <string>
 #include <fstream>
 #include <QThread>
+#include <sstream>
 
+#define MAXFRAMES 30
 #define NUM_VERTICES 500
 #define MODEL_SIZE 2
 #define SLEEPTIME 50
-#define FRAMELENGTH 1000
 typedef Angel::vec4 point4;
 typedef Angel::vec4 color4;
 
@@ -97,7 +98,7 @@ protected:
     void constraintAngle(int ang, double low, double high);
 
 
-    float angles[30][30];
+    float angles[MAXFRAMES][30];
 
 private:
     float getRelativeX(int x);
@@ -105,6 +106,7 @@ private:
     void selectColor(int);
     void selectColor(int part1, int part2);
     void loadFrame(int act);
+    int frameInterval[MAXFRAMES];
     float mouseDownX;
     float mouseDownY;
     float globalRotateX;
@@ -165,6 +167,8 @@ signals:
 public slots:
     void loadAnglesFromFile(std::string fileName);
     void animate();
+    void recordActiveScene(int interval);
+    std::string dump();
 
 };
 

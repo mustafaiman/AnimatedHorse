@@ -42,9 +42,39 @@
       </widget>
      </item>
      <item>
+      <widget class="QSpinBox" name="intervalBox">
+       <property name="minimum">
+        <number>20</number>
+       </property>
+       <property name="maximum">
+        <number>5000</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+       <property name="value">
+        <number>1000</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="recordFrameButton">
+       <property name="text">
+        <string>Record Scene</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="loadButton">
        <property name="text">
         <string>Load</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save</string>
        </property>
       </widget>
      </item>
@@ -108,8 +138,8 @@
    <slot>animate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>791</x>
-     <y>260</y>
+     <x>792</x>
+     <y>159</y>
     </hint>
     <hint type="destinationlabel">
      <x>625</x>
