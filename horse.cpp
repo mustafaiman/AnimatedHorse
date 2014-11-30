@@ -2,8 +2,9 @@
 Horse::Horse(QWidget *parent) :
     QGLWidget(parent)
 {
-    setFocus();
     setFocusPolicy(Qt::StrongFocus);
+    setFocus();
+    qDebug() << focusWidget();
     normalColor = color4(1.0,1.0,1.0,1.0);
     highlightColor = color4(1.0, 0.0, 0.0, 1.0);
     angles[0][TailZ] = 0.0;
@@ -94,6 +95,7 @@ void Horse::mouseMoveEvent(QMouseEvent *event) {
     float x = getRelativeX(event->x());
     float y = getRelativeY(event->y());
 
+
     globalRotateX = globalRotateX + (y-mouseDownY)/2*180;
     if(globalRotateX > 360.0)
         globalRotateX -= 360;
@@ -142,6 +144,7 @@ void Horse::loadFrame(int act) {
 }
 
 void Horse::paintGL() {
+    qDebug() << "paintgl";
     glClearColor(EXPANDVEC4(clearColor));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if(activeFrame > 0) {
@@ -508,13 +511,13 @@ void Horse::quad( int a, int b, int c, int d )
 void Horse::animate() {
     qDebug() << "start";
     for(int i=2;i<=totalFrames;i++) {
-        for(int j=0;j<FRAMELENGTH/SLEEPTIME;j++) {
+        for(int j=0;j<=FRAMELENGTH/SLEEPTIME;j++) {
             for(int k=0;k<Whole;k++) {
                 angles[0][k] = (float)j*(angles[i][k]-angles[i-1][k])/(FRAMELENGTH/SLEEPTIME) + angles[i-1][k];
             }
             qDebug() << angles[0][FrontLLowerLeg];
             QThread::msleep(SLEEPTIME);
-            update();
+            updateGL();
         }
     }
 }
@@ -522,6 +525,7 @@ void Horse::animate() {
 void Horse::loadAnglesFromFile(std::string fileName) {
     totalFrames++;
     activeFrame = totalFrames;
+    activePart = TAIL_Y;
     std::ifstream file(fileName);
     for(int i=0;i<Whole; i++) {
         file >> angles[activeFrame][i];
