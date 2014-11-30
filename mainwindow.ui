@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Animated Horse</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="Horse" name="openGLWidget" native="true">
@@ -35,6 +35,34 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <widget class="QCheckBox" name="fillModeBox">
+       <property name="text">
+        <string>Design Mode</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="activeLabel">
+         <property name="text">
+          <string>Total Key Frames:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="activeFrameLabel_2">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="QPushButton" name="playButton">
        <property name="text">
         <string>Play</string>
@@ -42,25 +70,77 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="intervalBox">
-       <property name="minimum">
-        <number>20</number>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-       <property name="maximum">
-        <number>5000</number>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
        </property>
-       <property name="singleStep">
-        <number>50</number>
-       </property>
-       <property name="value">
-        <number>1000</number>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="changeFrameButton">
+         <property name="text">
+          <string>Go to frame: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="changeFrameEdit"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="intervalLabel">
+         <property name="text">
+          <string>Interval</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="intervalBox">
+         <property name="minimum">
+          <number>20</number>
+         </property>
+         <property name="maximum">
+          <number>5000</number>
+         </property>
+         <property name="singleStep">
+          <number>50</number>
+         </property>
+         <property name="value">
+          <number>1000</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="msLabel">
+         <property name="text">
+          <string>ms</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveActiveButton">
+       <property name="text">
+        <string>Save Active Scene</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="recordFrameButton">
        <property name="text">
-        <string>Record Scene</string>
+        <string>Record New Scene</string>
        </property>
       </widget>
      </item>
@@ -109,7 +189,10 @@
    <header>horse.h</header>
    <container>1</container>
    <slots>
+    <signal>frameChanged(QString)</signal>
     <slot>animate()</slot>
+    <slot>changeFill(bool)</slot>
+    <slot>editActiveScene()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -122,8 +205,8 @@
    <slot>slot1()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>778</x>
-     <y>516</y>
+     <x>779</x>
+     <y>713</y>
     </hint>
     <hint type="destinationlabel">
      <x>645</x>
@@ -138,12 +221,60 @@
    <slot>animate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>792</x>
-     <y>159</y>
+     <x>793</x>
+     <y>110</y>
     </hint>
     <hint type="destinationlabel">
      <x>625</x>
      <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fillModeBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>changeFill(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>786</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>frameChanged(QString)</signal>
+   <receiver>activeFrameLabel_2</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>593</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>930</x>
+     <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveActiveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>editActiveScene()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>884</x>
+     <y>643</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>731</x>
+     <y>406</y>
     </hint>
    </hints>
   </connection>

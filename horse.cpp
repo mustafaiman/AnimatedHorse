@@ -2,10 +2,11 @@
 Horse::Horse(QWidget *parent) :
     QGLWidget(parent)
 {
+
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
     qDebug() << focusWidget();
-    normalColor = color4(1.0,1.0,1.0,1.0);
+    normalColor = color4(0.0,0.0,1.0,1.0);
     highlightColor = color4(1.0, 0.0, 0.0, 1.0);
     angles[0][TailZ] = 0.0;
     angles[0][TailY] = 30.0;
@@ -56,7 +57,7 @@ Horse::Horse(QWidget *parent) :
     cube_colors[0] = color4( 1.0, 1.0, 1.0, 1.0 );  // black
     cube_colors[1] = color4( 1.0, 1.0, 1.0, 1.0 );  // red
     cube_colors[2] = color4( 1.0, 1.0, 1.0, 1.0 );  // yellow
-    cube_colors[3] = color4( 1.0, 1.0, 1.0, 1.0 );  // green
+    cube_colors[3] = color4( 0.0, 1.0, 0.0, 1.0 );  // green
     cube_colors[4] = color4( 1.0, 1.0, 1.0, 1.0 );  // blue
     cube_colors[5] = color4( 1.0, 1.0, 1.0, 1.0 );  // magenta
     cube_colors[6] = color4( 1.0, 1.0, 1.0, 1.0 );  // white
@@ -73,9 +74,12 @@ Horse::Horse(QWidget *parent) :
 
     activePart = TailY;
 
+    projection = Ortho(-2.0,2.0,-2.0,2.0,-4.0,4.0);
     colorcube();
 
-    clearColor = color4(0.0,0.0,0.0,1.0);
+    fillMode =  GL_FILL;
+
+    clearColor = color4(1.0,1.0,1.0,1.0);
 
 }
 float Horse::getRelativeX(int x) {
@@ -90,25 +94,40 @@ void Horse::mousePressEvent(QMouseEvent *event) {
     qDebug() << "mouse press";
     qDebug() << focusWidget();
     if(event->button() == Qt::RightButton) {
-        activePart = (activePart + 1)%Whole;
+        activePart = (activePart + 1)%(Whole+1);
         updateGL();
     } else if(event->button() == Qt::LeftButton) {
         mouseDownX = getRelativeX(event->x());
         mouseDownY = getRelativeY(event->y());
     } else if(event->button() == Qt::MiddleButton) {
 
-        activePart = (activePart + Whole - 1)%Whole;
+        activePart = (activePart + Whole)%(Whole + 1);
     }
+    updateGL();
 }
 
 void Horse::mouseMoveEvent(QMouseEvent *event) {
     float x = getRelativeX(event->x());
     float y = getRelativeY(event->y());
 
+    if(activePart == Whole) {
+        globalRotateX = globalRotateX + (y-mouseDownY)/2*180;
+        if(globalRotateX > 360.0)
+            globalRotateX -= 360;
+        else if(globalRotateX < 0)
+            globalRotateX += 360;
+        globalRotateY = globalRotateY + (x-mouseDownX)/2*180;
+        if(globalRotateY > 360.0)
+            globalRotateY -= 360;
+        else if(globalRotateY < 0)
+            globalRotateY += 360;
 
-    angles[0][activePart] = angles[0][activePart] + (y-mouseDownY)/2*180;
+    } else {
+        angles[0][activePart] = angles[0][activePart] + (y-mouseDownY)/2*180;
 
-    angles[0][activePart] = angles[0][activePart] + (x-mouseDownX)/2*180;
+        angles[0][activePart] = angles[0][activePart] + (x-mouseDownX)/2*180;
+
+    }
 
     mouseDownX = x;
     mouseDownY = y;
@@ -122,23 +141,64 @@ void Horse::initializeGL() {
 
     glGenBuffers(1,&bufferId);
     glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(colors), NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(colors) + sizeof(normals), NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(colors), colors);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(colors), sizeof(normals), normals);
 
     GLuint vPosition = shaders.attributeLocation("vPosition");
     shaders.enableAttributeArray(vPosition);
     glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+    GLuint vNormal = shaders.attributeLocation("vNormal");
+    shaders.enableAttributeArray(vNormal);
+    glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(vertices)+sizeof(colors)));
 /*
     GLuint vColor = shaders.attributeLocation("vColor");
     shaders.enableAttributeArray(vColor);
     glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(vertices)));
 */
     shaders.setUniformValue("color",EXPANDVEC4(cube_colors[13]));
-    glEnable( GL_DEPTH_TEST );
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glEnable( GL_DEPTH_TEST  );
+    glShadeModel(GL_FLAT);
 
 
+    shaders.setUniformValue("Projection",QMatrix4x4(EXPANDMAT44(projection)));
+
+    point4 light_position( 1.0, 4.0, -4.0, 0.0 );
+    color4 light_ambient( 0.2, 0.2, 0.2, 1.0 );
+    color4 light_diffuse( 1.0, 1.0, 1.0, 1.0 );
+    color4 light_specular( 1.0, 1.0, 1.0, 1.0 );
+
+    color4 material_ambient( 1.0, 0.0, 1.0, 1.0 );
+    color4 material_diffuse( 0.0, 0.8, 0.0, 1.0 );
+    color4 material_specular( 1.0, 0.8, 0.0, 1.0 );
+    float  material_shininess = 100.0;
+
+    color4 ambient_product = light_ambient * material_ambient;
+    color4 diffuse_product = light_diffuse * material_diffuse;
+    color4 specular_product = light_specular * material_specular;
+
+    shaders.setUniformValue("AmbientProduct",EXPANDVEC4(ambient_product));
+    shaders.setUniformValue("DiffuseProduct",EXPANDVEC4(diffuse_product));
+    shaders.setUniformValue("SpecularProduct",EXPANDVEC4(specular_product));
+    shaders.setUniformValue("LightPosition",EXPANDVEC4(light_position));
+    shaders.setUniformValue("Shininess",material_shininess);
+
+    shaders.setUniformValue("designMode",false);
+
+
+}
+
+void Horse::changeFill(bool a) {
+    if(a) {
+        shaders.setUniformValue("designMode",true);
+        fillMode = GL_LINE;
+    } else {
+        shaders.setUniformValue("designMode",false);
+        fillMode = GL_FILL;
+    }
+    updateGL();
 }
 
 void Horse::loadFrame(int act) {
@@ -147,16 +207,37 @@ void Horse::loadFrame(int act) {
 }
 
 void Horse::paintGL() {
+    glPolygonMode( GL_FRONT_AND_BACK, fillMode );
     glClearColor(EXPANDVEC4(clearColor));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     if(activeFrame > 0) {
 
 
-        constraintAngle(TailY,0.0,30.0);
-        constraintAngle(TailZ,0.0,30.0);
+        constraintAngle(TailY,-30.0,30.0);
+        constraintAngle(TailZ,-10.0,90.0);
+        constraintAngle(NeckZ,3.0,90.0);
+        constraintAngle(NeckY,-50.0,50.0);
+        constraintAngle(HeadZ,-110.0,0);
+        constraintAngle(HeadY,-60.0,60.0);
 
-        model_view = Translate(0.0,0.0,0.0)*RotateX(-globalRotateX)*RotateY(globalRotateY)*Scale(0.8,0.8,0.8);
+
+
+        model_view = Translate(0.0,0.0,0.0)*RotateX(-globalRotateX)*RotateY(globalRotateY);
+        mvstack.push(model_view);
+        model_view *= Translate(0.0,-GROUND_Y/2-1.0,0.0);
+        //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+        ground();
+
+        //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+        model_view = mvstack.pop();
+
+        mvstack.push(model_view);
+        model_view *= Translate(0.0,0.0,0.0);
         trunk();
+        model_view = mvstack.pop();
 
         mvstack.push(model_view);
         selectColor(UpperTail);
@@ -337,9 +418,9 @@ void Horse::selectColor(int part1, int part2) {
 
 void Horse::selectColor(int part) {
     if(activePart == part)
-        shaders.setUniformValue("color",EXPANDVEC4(highlightColor));
+        shaders.setUniformValue("vColor",EXPANDVEC4(highlightColor));
     else
-        shaders.setUniformValue("color",EXPANDVEC4(normalColor));
+        shaders.setUniformValue("vColor",EXPANDVEC4(normalColor));
 }
 
 void Horse::resizeGL(int width, int height) {
@@ -370,6 +451,17 @@ void Horse::keyPressEvent(QKeyEvent *event) {
         animate();
     qDebug() << event->key();
     update();
+}
+
+void Horse::ground() {
+    mvstack.push( model_view );
+    mat4 instance = model_view * (Scale(GROUND_X,GROUND_Y,GROUND_Z));
+
+    shaders.setUniformValue("ModelView",QMatrix4x4(EXPANDMAT44(instance)));
+    shaders.setUniformValue("color",EXPANDVEC4(cube_colors[3]));
+    glDrawArrays( GL_TRIANGLES, 0, NumNodes );
+    shaders.setUniformValue("color",EXPANDVEC4(cube_colors[13]));
+    model_view = mvstack.pop();
 }
 
 void Horse::neck() {
@@ -514,16 +606,22 @@ void Horse::shoulderb() {
 }
 void Horse::quad( int a, int b, int c, int d )
 {
-    colors[Index] = cube_colors[a]; vertices[Index] = cube_points[a]; Index++;
-    colors[Index] = cube_colors[a]; vertices[Index] = cube_points[b]; Index++;
-    colors[Index] = cube_colors[a]; vertices[Index] = cube_points[c]; Index++;
-    colors[Index] = cube_colors[a]; vertices[Index] = cube_points[a]; Index++;
-    colors[Index] = cube_colors[a]; vertices[Index] = cube_points[c]; Index++;
-    colors[Index] = cube_colors[a]; vertices[Index] = cube_points[d]; Index++;
+    vec4 u = vertices[b] - vertices[a];
+    vec4 v = vertices[c] - vertices[b];
+
+    vec3 normal = normalize( cross(u, v) );
+
+
+    normals[Index] = normal; colors[Index] = cube_colors[a]; vertices[Index] = cube_points[a]; Index++;
+    normals[Index] = normal; colors[Index] = cube_colors[a]; vertices[Index] = cube_points[b]; Index++;
+    normals[Index] = normal; colors[Index] = cube_colors[a]; vertices[Index] = cube_points[c]; Index++;
+    normals[Index] = normal; colors[Index] = cube_colors[a]; vertices[Index] = cube_points[a]; Index++;
+    normals[Index] = normal; colors[Index] = cube_colors[a]; vertices[Index] = cube_points[c]; Index++;
+    normals[Index] = normal; colors[Index] = cube_colors[a]; vertices[Index] = cube_points[d]; Index++;
 }
 
 void Horse::animate() {
-    qDebug() << "start";
+    update();
     for(int i=2;i<=totalFrames;i++) {
         for(int j=0;j<=frameInterval[i-1]/SLEEPTIME;j++) {
             for(int k=0;k<Whole;k++) {
@@ -532,6 +630,12 @@ void Horse::animate() {
             QThread::msleep(SLEEPTIME);
             updateGL();
         }
+    }
+}
+
+void Horse::reloadActiveFrame() {
+    for(int k=0;k<Whole;k++) {
+        angles[0][k] = angles[activeFrame][k];
     }
 }
 
@@ -573,7 +677,23 @@ void Horse::recordActiveScene(int interval) {
     for(int i=0;i<Whole;i++) {
         angles[activeFrame][i] = angles[0][i];
     }
+    emit frameChanged(QString::number(totalFrames));
     frameInterval[activeFrame] = 0;
+}
+
+void Horse::editActiveScene() {
+    for(int i=0;i<Whole;i++) {
+        angles[activeFrame][i] = angles[0][i];
+    }
+}
+
+void Horse::changeActiveFrame(int fNumber) {
+    if(fNumber > totalFrames)
+        fNumber = totalFrames;
+    activeFrame = fNumber;
+    reloadActiveFrame();
+    updateGL();
+    update();
 }
 
 void Horse::constraintAngle(int ang, double low, double high) {

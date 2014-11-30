@@ -46,3 +46,9 @@ void MainWindow::on_saveButton_clicked()
     of << ui->openGLWidget->dump();
     of.close();
 }
+
+void MainWindow::on_changeFrameButton_clicked()
+{
+    int nn = ui->changeFrameEdit->text().toInt();
+    ui->openGLWidget->changeActiveFrame(nn);
+}

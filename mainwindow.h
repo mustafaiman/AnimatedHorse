@@ -23,6 +23,8 @@ private slots:
 
     void on_saveButton_clicked();
 
+    void on_changeFrameButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
