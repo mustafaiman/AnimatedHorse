@@ -94,6 +94,7 @@ protected:
     void frontUpperLeg();
     void frontLowerLeg();
     void hoof();
+    void constraintAngle(int ang, double low, double high);
 
 
     float angles[30][30];
@@ -102,6 +103,7 @@ private:
     float getRelativeX(int x);
     float getRelativeY(int y);
     void selectColor(int);
+    void selectColor(int part1, int part2);
     void loadFrame(int act);
     float mouseDownX;
     float mouseDownY;

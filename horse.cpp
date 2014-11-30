@@ -87,8 +87,18 @@ float Horse::getRelativeY(int y) {
 }
 
 void Horse::mousePressEvent(QMouseEvent *event) {
-    mouseDownX = getRelativeX(event->x());
-    mouseDownY = getRelativeY(event->y());
+    qDebug() << "mouse press";
+    qDebug() << focusWidget();
+    if(event->button() == Qt::RightButton) {
+        activePart = (activePart + 1)%Whole;
+        updateGL();
+    } else if(event->button() == Qt::LeftButton) {
+        mouseDownX = getRelativeX(event->x());
+        mouseDownY = getRelativeY(event->y());
+    } else if(event->button() == Qt::MiddleButton) {
+
+        activePart = (activePart + Whole - 1)%Whole;
+    }
 }
 
 void Horse::mouseMoveEvent(QMouseEvent *event) {
@@ -96,20 +106,13 @@ void Horse::mouseMoveEvent(QMouseEvent *event) {
     float y = getRelativeY(event->y());
 
 
-    globalRotateX = globalRotateX + (y-mouseDownY)/2*180;
-    if(globalRotateX > 360.0)
-        globalRotateX -= 360;
-    else if(globalRotateX < 0)
-        globalRotateX += 360;
-    globalRotateY = globalRotateY + (x-mouseDownX)/2*180;
-    if(globalRotateY > 360.0)
-        globalRotateY -= 360;
-    else if(globalRotateY < 0)
-        globalRotateY += 360;
+    angles[0][activePart] = angles[0][activePart] + (y-mouseDownY)/2*180;
+
+    angles[0][activePart] = angles[0][activePart] + (x-mouseDownX)/2*180;
 
     mouseDownX = x;
     mouseDownY = y;
-    update();
+    updateGL();
 }
 
 void Horse::initializeGL() {
@@ -144,11 +147,13 @@ void Horse::loadFrame(int act) {
 }
 
 void Horse::paintGL() {
-    qDebug() << "paintgl";
     glClearColor(EXPANDVEC4(clearColor));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if(activeFrame > 0) {
 
+
+        constraintAngle(TailY,0.0,30.0);
+        constraintAngle(TailZ,0.0,30.0);
 
         model_view = Translate(0.0,0.0,0.0)*RotateX(-globalRotateX)*RotateY(globalRotateY)*Scale(0.8,0.8,0.8);
         trunk();
@@ -159,7 +164,7 @@ void Horse::paintGL() {
         upperTail();
 
         mvstack.push(model_view);
-        selectColor(TailY);
+        selectColor(TailY,TailZ);
         model_view *= Translate(-(UPPERTAIL_X),0.0,0.0)*RotateZ(angles[0][TailZ])*RotateY(angles[0][TailY]);
         tail();
 
@@ -168,12 +173,12 @@ void Horse::paintGL() {
 
         mvstack.push(model_view);
         model_view *= (Translate(TRUNK_X/2,TRUNK_Y/2,0.0)*RotateZ(angles[0][NeckZ])*RotateY(angles[0][NeckY]));
-        selectColor(NeckY);
+        selectColor(NeckY,NeckZ);
         neck();
 
         mvstack.push(model_view);
         model_view *= Translate(NECK_X,-NECK_Y/2,0.0)*RotateZ(angles[0][HeadZ])*RotateY(angles[0][HeadY]);
-        selectColor(HeadY);
+        selectColor(HeadY,HeadZ);
         head();
 
         model_view = mvstack.pop();
@@ -319,7 +324,15 @@ void Horse::paintGL() {
         model_view = mvstack.pop();
     }
 
+    setFocus();
 
+}
+
+void Horse::selectColor(int part1, int part2) {
+    if(activePart == part1)
+        selectColor(part1);
+    else
+        selectColor(part2);
 }
 
 void Horse::selectColor(int part) {
@@ -355,6 +368,7 @@ void Horse::keyPressEvent(QKeyEvent *event) {
         activePart = (activePart + 1)%(Whole+1);
     if(event->key() == Qt::Key_R)
         animate();
+    qDebug() << event->key();
     update();
 }
 
@@ -534,6 +548,13 @@ void Horse::loadAnglesFromFile(std::string fileName) {
     loadFrame(activeFrame);
     qDebug() << "totalFrames " << totalFrames << "activeFrame" << activeFrame;
     update();
+}
+
+void Horse::constraintAngle(int ang, double low, double high) {
+    if(angles[0][ang] < low)
+        angles[0][ang] = low;
+    if(angles[0][ang] > high)
+        angles[0][ang] = high;
 }
 
 void Horse::colorcube( void )
