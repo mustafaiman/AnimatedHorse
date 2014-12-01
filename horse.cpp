@@ -222,7 +222,6 @@ void Horse::paintGL() {
         constraintAngle(HeadY,-60.0,60.0);
 
 
-
         model_view = Translate(0.0,0.0,0.0)*RotateX(-globalRotateX)*RotateY(globalRotateY);
         mvstack.push(model_view);
         model_view *= Translate(0.0,-GROUND_Y/2-1.0,0.0);
@@ -289,7 +288,7 @@ void Horse::paintGL() {
         rearLowerLeg();
 
         mvstack.push(model_view);
-        model_view *= Translate(HOOF_X/2-FLLEG_X/2,-FLLEG_Y,0.0)*RotateZ(angles[0][HoofRR]);
+        model_view *= Translate(HOOF_X/2-RLLEG_X/2,-RLLEG_Y,0.0)*RotateZ(angles[0][HoofRR]);
         selectColor(HoofRR);
         hoof();
         model_view = mvstack.pop();
@@ -323,7 +322,7 @@ void Horse::paintGL() {
         rearLowerLeg();
 
         mvstack.push(model_view);
-        model_view *= Translate(HOOF_X/2-FLLEG_X/2,-FLLEG_Y,0.0)*RotateZ(angles[0][HoofRL]);
+        model_view *= Translate(HOOF_X/2-RLLEG_X/2,-RLLEG_Y,0.0)*RotateZ(angles[0][HoofRL]);
         selectColor(HoofRL);
         hoof();
         model_view = mvstack.pop();

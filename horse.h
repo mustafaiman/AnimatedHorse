@@ -48,7 +48,7 @@ typedef Angel::vec4 color4;
 #define RULEG_Y 0.35
 #define RULEG_Z 0.06
 #define RLLEG_X 0.04
-#define RLLEG_Y 0.35
+#define RLLEG_Y 0.40
 #define RLLEG_Z 0.04
 #define SHOULDERA_X 0.09
 #define SHOULDERA_Y 0.4
