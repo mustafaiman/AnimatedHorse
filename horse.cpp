@@ -165,13 +165,13 @@ void Horse::initializeGL() {
 
     shaders.setUniformValue("Projection",QMatrix4x4(EXPANDMAT44(projection)));
 
-    point4 light_position( 1.0, 4.0, -4.0, 0.0 );
-    color4 light_ambient( 0.2, 0.2, 0.2, 1.0 );
+    point4 light_position( 0.0, 0.0, -1.0, 0.0 );
+    color4 light_ambient( 1.0, 1.0, 1.0, 1.0 );
     color4 light_diffuse( 1.0, 1.0, 1.0, 1.0 );
     color4 light_specular( 1.0, 1.0, 1.0, 1.0 );
 
-    color4 material_ambient( 1.0, 0.0, 1.0, 1.0 );
-    color4 material_diffuse( 0.0, 0.8, 0.0, 1.0 );
+    color4 material_ambient( 0.5, 0.5, 0.0, 1.0 );
+    color4 material_diffuse( 1.0, 0.8, 0.0, 1.0 );
     color4 material_specular( 1.0, 0.8, 0.0, 1.0 );
     float  material_shininess = 100.0;
 
@@ -214,12 +214,35 @@ void Horse::paintGL() {
     if(activeFrame > 0) {
 
 
+        constraintAngle(UpperTail,0,15);
         constraintAngle(TailY,-30.0,30.0);
         constraintAngle(TailZ,-10.0,90.0);
         constraintAngle(NeckZ,3.0,90.0);
         constraintAngle(NeckY,-50.0,50.0);
         constraintAngle(HeadZ,-110.0,0);
         constraintAngle(HeadY,-60.0,60.0);
+        constraintAngle(HipRA,-75,10);
+        constraintAngle(HipLA,-75,10);
+        constraintAngle(HipRB,5,60);
+        constraintAngle(HipLB,5,60);
+        constraintAngle(RearRUpperLeg,-170,5);
+        constraintAngle(RearRLowerLeg,5,170);
+        constraintAngle(RearLUpperLeg,-170,5);
+        constraintAngle(RearLLowerLeg,5,170);
+        constraintAngle(ShoulderRA,-10,75);
+        constraintAngle(ShoulderRB,-60,-5);
+        constraintAngle(ShoulderLA,-10,75);
+        constraintAngle(ShoulderLB,-60,-5);
+        constraintAngle(FrontRUpperLeg,-5,170);
+        constraintAngle(FrontRLowerLeg,-170,-5);
+        constraintAngle(FrontLUpperLeg,-5,170);
+        constraintAngle(FrontLLowerLeg,-170,-5);
+        constraintAngle(HoofRR,-55,20);
+        constraintAngle(HoofRL,-55,20);
+        constraintAngle(HoofFR,-55,20);
+        constraintAngle(HoofFL,-55,20);
+
+
 
 
         model_view = Translate(0.0,0.0,0.0)*RotateX(-globalRotateX)*RotateY(globalRotateY);
@@ -639,7 +662,6 @@ void Horse::reloadActiveFrame() {
 }
 
 void Horse::loadAnglesFromFile(std::string fileName) {
-    totalFrames++;
     activePart = TAIL_Y;
     std::ifstream file(fileName);
     file >> totalFrames;
