@@ -259,9 +259,9 @@ void Horse::paintGL() {
         constraintAngle(RearLUpperLeg,-170,5);
         constraintAngle(RearLLowerLeg,5,170);
         constraintAngle(ShoulderRA,-10,75);
-        constraintAngle(ShoulderRB,-60,-5);
+        constraintAngle(ShoulderRB,-80,-5);
         constraintAngle(ShoulderLA,-10,75);
-        constraintAngle(ShoulderLB,-60,-5);
+        constraintAngle(ShoulderLB,-80,-5);
         constraintAngle(FrontRUpperLeg,-5,170);
         constraintAngle(FrontRLowerLeg,-170,-5);
         constraintAngle(FrontLUpperLeg,-5,170);
