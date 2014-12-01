@@ -3,6 +3,8 @@ Horse::Horse(QWidget *parent) :
     QGLWidget(parent)
 {
 
+    setFocusPolicy(Qt::StrongFocus);
+    setFocus();
 
     if(!imageB.load(":/skin.bmp")) {
         qDebug() << "Image not found";
@@ -10,8 +12,6 @@ Horse::Horse(QWidget *parent) :
         imageB.fill(1);
     }
     imageT = QGLWidget::convertToGLFormat(imageB);
-    setFocusPolicy(Qt::StrongFocus);
-    setFocus();
     normalColor = color4(0.0,0.0,1.0,1.0);
     highlightColor = color4(1.0, 0.0, 0.0, 1.0);
     angles[0][TailZ] = 0.0;
@@ -97,15 +97,21 @@ float Horse::getRelativeY(int y) {
 
 void Horse::mousePressEvent(QMouseEvent *event) {
     setFocus();
-    if(event->button() == Qt::RightButton) {
-        nextJoint();
-    } else if(event->button() == Qt::LeftButton) {
+    if(event->button() == Qt::LeftButton) {
         mouseDownX = getRelativeX(event->x());
         mouseDownY = getRelativeY(event->y());
-    } else if(event->button() == Qt::MiddleButton) {
-        previousJoint();
     }
     updateGL();
+}
+
+void Horse::wheelEvent(QWheelEvent *event) {
+    if(event->orientation() == Qt::Vertical) {
+        if(event->delta() > 0) {
+            nextJoint();
+        } else if(event->delta() < 0) {
+            previousJoint();
+        }
+    }
 }
 
 void Horse::selectWhole() {
@@ -120,6 +126,7 @@ void Horse::nextJoint() {
 
 void Horse::previousJoint() {
     activePart = (activePart + Whole -1)%Whole;
+    updateGL();
 }
 
 void Horse::mouseMoveEvent(QMouseEvent *event) {
@@ -297,7 +304,7 @@ void Horse::paintGL() {
         model_view = mvstack.pop();
 
         mvstack.push(model_view);
-        model_view *= (Translate(TRUNK_X/2,TRUNK_Y/2,0.0)*RotateZ(angles[0][NeckZ])*RotateY(angles[0][NeckY]));
+        model_view *= (Translate(TRUNK_X/2-NECK_Y,TRUNK_Y/2,0.0)*RotateZ(angles[0][NeckZ])*RotateY(angles[0][NeckY]));
         selectColor(NeckY,NeckZ);
         neck();
 
@@ -488,18 +495,7 @@ void Horse::initShaders() {
         close();
 
 }
-void Horse::keyPressEvent(QKeyEvent *event) {
-    if(event->key() ==  Qt::Key_Tab)
-        activePart = (activePart + 1)%(Whole+1);
-    if(event->key() == Qt::Key_R)
-        animate();
-    qDebug() << event->key();
-    update();
-}
 
-void Horse::focusOutEvent(QFocusEvent *event) {
-    qDebug()<<"lost focuse";
-}
 
 void Horse::ground() {
     mvstack.push( model_view );

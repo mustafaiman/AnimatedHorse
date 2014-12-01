@@ -25,6 +25,7 @@ private slots:
 
     void on_changeFrameButton_clicked();
 
+
 private:
     Ui::MainWindow *ui;
 };

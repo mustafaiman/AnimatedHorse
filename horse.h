@@ -33,39 +33,39 @@ typedef Angel::vec2 point2;
 #define TAIL_X 0.3
 #define TAIL_Y 0.05
 #define TAIL_Z 0.05
-#define NECK_X 0.25
+#define NECK_X 0.35
 #define NECK_Y 0.15
 #define NECK_Z 0.15
 #define HEAD_X 0.30
 #define HEAD_Y 0.17
 #define HEAD_Z 0.15
-#define HIPA_X 0.08
+#define HIPA_X 0.12
 #define HIPA_Y 0.3
-#define HIPA_Z 0.08
-#define HIPB_X 0.06
+#define HIPA_Z 0.12
+#define HIPB_X 0.11
 #define HIPB_Y 0.3
-#define HIPB_Z 0.06
-#define RULEG_X 0.06
+#define HIPB_Z 0.11
+#define RULEG_X 0.09
 #define RULEG_Y 0.35
-#define RULEG_Z 0.06
-#define RLLEG_X 0.04
+#define RULEG_Z 0.09
+#define RLLEG_X 0.07
 #define RLLEG_Y 0.40
-#define RLLEG_Z 0.04
-#define SHOULDERA_X 0.09
+#define RLLEG_Z 0.07
+#define SHOULDERA_X 0.12
 #define SHOULDERA_Y 0.4
-#define SHOULDERA_Z 0.09
-#define SHOULDERB_X 0.07
+#define SHOULDERA_Z 0.12
+#define SHOULDERB_X 0.11
 #define SHOULDERB_Y 0.25
-#define SHOULDERB_Z 0.07
-#define FULEG_X 0.06
+#define SHOULDERB_Z 0.11
+#define FULEG_X 0.09
 #define FULEG_Y 0.35
-#define FULEG_Z 0.06
-#define FLLEG_X 0.04
+#define FULEG_Z 0.09
+#define FLLEG_X 0.07
 #define FLLEG_Y 0.35
-#define FLLEG_Z 0.04
+#define FLLEG_Z 0.07
 #define HOOF_X 0.09
-#define HOOF_Y 0.05
-#define HOOF_Z 0.05
+#define HOOF_Y 0.08
+#define HOOF_Z 0.08
 
 class Horse : public QGLWidget, protected QGLFunctions
 {
@@ -82,8 +82,7 @@ protected:
     void colorcube( void );
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void focusOutEvent(QFocusEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
     //ground
     void ground();
@@ -189,7 +188,6 @@ private:
     QGLShaderProgram shaders;
     GLuint bufferId;
     point4 vertices[NUM_VERTICES];
-//    color4 colors[NUM_VERTICES];
     point2 tex_coord[NUM_VERTICES];
     vec3 normals[NUM_VERTICES];
     point4 cube_points[8];
