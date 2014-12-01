@@ -19,6 +19,7 @@
 #define SLEEPTIME 50
 typedef Angel::vec4 point4;
 typedef Angel::vec4 color4;
+typedef Angel::vec2 point2;
 
 #define GROUND_X 30.0
 #define GROUND_Y 2.0
@@ -82,6 +83,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void focusOutEvent(QFocusEvent *event);
 
     //ground
     void ground();
@@ -100,10 +102,32 @@ protected:
     void frontUpperLeg();
     void frontLowerLeg();
     void hoof();
+    void nextJoint();
+    void previousJoint();
     void constraintAngle(int ang, double low, double high);
     void reloadActiveFrame();
+    void setShading(int a);
 
 
+    point4 light_position;
+    color4 light_ambient;
+    color4 light_diffuse;
+    color4 light_specular;
+    color4 material_ambient;
+    color4 material_diffuse;
+    color4 material_specular;
+
+    color4 horse_ambient;
+    color4 horse_diffuse;
+    color4 horse_specular;
+    float horse_shininess;
+
+    color4 ground_ambient;
+    color4 ground_diffuse;
+    color4 ground_specular;
+    float ground_shininess;
+
+    float  material_shininess = 100.0;
     float angles[MAXFRAMES][30];
 
 private:
@@ -121,6 +145,10 @@ private:
     int totalFrames;
     double radius;
     GLuint fillMode;
+    GLuint mytex[1];
+    QImage imageT;
+    QImage imageB;
+
 
     enum {
         NeckZ = 0,
@@ -161,7 +189,8 @@ private:
     QGLShaderProgram shaders;
     GLuint bufferId;
     point4 vertices[NUM_VERTICES];
-    color4 colors[NUM_VERTICES];
+//    color4 colors[NUM_VERTICES];
+    point2 tex_coord[NUM_VERTICES];
     vec3 normals[NUM_VERTICES];
     point4 cube_points[8];
     int Index;
@@ -183,6 +212,7 @@ public slots:
     void changeFill(bool a);
     void changeActiveFrame(int fNumber);
     void editActiveScene();
+    void selectWhole();
 
 };
 

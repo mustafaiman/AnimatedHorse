@@ -5,6 +5,8 @@ in vec4 vPosition;
 uniform vec4 vColor;
 in vec3 vNormal;
 out vec4 color;
+in vec2 texcoord;
+out vec2 st;
 
 uniform bool designMode;
 
@@ -41,6 +43,6 @@ void main()
         color = ambient + diffuse + specular;
         color.a = 1.0;
     }
-
+    st = texcoord;
     gl_Position = Projection*ModelView*vPosition;
 }
