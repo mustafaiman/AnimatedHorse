@@ -694,7 +694,6 @@ void Horse::loadAnglesFromFile(std::string fileName) {
     }
     file.close();
     loadFrame(activeFrame);
-    qDebug() << "totalFrames " << totalFrames << "activeFrame" << activeFrame;
     update();
 }
 
