@@ -84,7 +84,7 @@ Horse::Horse(QWidget *parent) :
 
     fillMode =  GL_FILL;
 
-    clearColor = color4(1.0,1.0,1.0,1.0);
+    clearColor = color4(0.8,1.0,1.0,1.0);
 
 }
 float Horse::getRelativeX(int x) {
